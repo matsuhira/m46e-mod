@@ -1,0 +1,235 @@
+M46E コマンドマニュアル
+
+
+●M46E-PR設定コマンド
+
+名前
+	pr - M46E-PRの設定
+
+書式
+	pr -s pr-prefix <ipv4addr/mask> <m46e-prefix(64bit)> <planeID>
+	pr -s default <m46e-prefix(64bit)>
+	pr -d pr-prefix <ipv4addr/mask> <planeID>
+	pr -d default
+	pr -f <filepath>
+
+説明
+	M46E-PR(Prefix Resolution)の宛先アドレスの設定に使用する。
+	引数が与えられないと、m46e_pr_cmdは現在設定されているM46E-PRの
+	宛先アドレステーブル一覧を表示する。
+
+オプション
+	-s
+		指定した宛先アドレスをテーブルに追加する。
+	-d
+		指定したアドレスをテーブルから削除する。
+	-f
+		指定したファイルに記載されている宛先アドレスを全てテーブルに
+		追加する。
+
+使用例
+	○宛先アドレスをテーブルに追加する
+	> pr -s pr-prefix 192.168.1.0/24 3ffe:1:: 1
+
+	○宛先アドレスをテーブルから削除する
+	> pr -d pr-prefix 192.168.1.0/24 1
+
+	○宛先アドレスをテーブルにファイルで一括登録する
+	<ファイルの記載例(pr.txt)>
+	192.168.1.0/24,3ffe:1::,1
+	192.168.1.0/24,3ffe:1::,2
+	192.168.2.0/24,3ffe:2::,1
+
+	> pr -f /home/m46e/pr.txt
+
+	○テーブル一覧を表示する
+	> pr
+
+	<出力例>
+	   PlaneID IPv4addr        Mask M46E-PR Prefix
+	---------- --------------- ---- ---------------------------------------
+        	 1 192.168.2.0     /120 3ffe:2::1:c0a8:200
+        	 1 192.168.1.0     /120 3ffe:1::1:c0a8:100
+        	 2 192.168.1.0     /120 3ffe:1::2:c0a8:100
+
+
+●M46E PMTU設定コマンド
+
+名前
+	pmtu - M46EのMTUの設定
+
+書式
+	pmtu -s <ip_addr> <mtu_value> <plane ID>
+	pmtu -d <ip_addr> <plane ID>
+	pmtu -t <timeout_value>
+	pmtu -f <on-off>
+
+説明
+	指定した経路毎にMTUを設定する。
+	引数が与えられないと、m46e_pmtuは現在設定されている経路毎のMTUの
+	一覧を表示する。
+
+オプション
+	-s
+		指定した経路にMTUを設定する。
+	-d
+		指定した経路の設定を削除する。
+	-t
+		MTUのキャッシュがクリアされる間隔を指定する。
+	-f
+		強制フラグメント機能のON、OFFを指定する。
+
+使用例
+	○経路にMTUを設定する
+	> pmtu -s 192.168.1.1 1280 1
+
+	○指定した経路に設定したMTUを削除する
+	> pmtu -d 192.168.1.1 1
+
+	○MTUのキャッシュがクリアされる間隔を指定する
+	> pmtu -t 400
+
+	○強制フラグメント機能をONにする
+	> pmtu -f on
+
+	○MTUを設定した経路の一覧を表示する
+	> pmtu
+
+	<出力例>
+	force fragment = ON
+	Address          planeID     MTU   Life(sec) : initial value = 400
+	---------------  ----------  ----  --------
+	192.168.1.1               1  1280  static
+	192.168.133.123           1  1300  static
+	192.168.100.123           1  1300  static
+
+	Total entries : 3
+
+
+●M46E Network NameSpace設定コマンド
+
+名前
+	ns - Network NameSpaceの設定
+
+書式
+	ns -s <NameSpace name> <planeid> <backbone v6 IF> <NameSpace v6 IF>
+	ns -s <NameSpace name> <planeid>
+	ns -d <NameSpace name>
+	ns -m <IF> <NameSpace name>
+	ns -i
+
+説明
+	Network NameSpaceの設定に使用する。
+	引数が与えられないと、現在設定されているNetwork NameSpaceとPlaneIDの一
+	覧を表示する。
+
+オプション
+	-s
+		指定したNameSpaceを作成する。
+		<backbone v6 IF> <NameSpace v6 IF>が省略されていた場合
+		は、自動で名前を設定する。
+	-d
+		指定したNameSpaceを削除する。
+	-m
+		インタフェースを指定したNameSpaceに移動する。
+	-i
+		インタフェースとifindexの一覧を表示する。
+
+引数の説明、制限
+	<NameSpace name> - NameSpaceの名前
+		●設定可能な文字数
+			1-65文字
+		●設定可能な文字
+			アルファベット大文字("A"～"Z")
+			アルファベット小文字("a"～"z")
+			数字("0"～"9")
+			ハイフン("-")※1
+			ピリオド(".")※1,2
+			※1 ハイフン、ピリオドは先頭の文字として使用できない。
+			※2 ピリオドは<NameSpace name>の最後の文字として使用で
+			    きない。
+	<planeid> - M46EのplaneID
+		●設定可能な数値
+			0-4294967295
+	<backbone v6 IF> <NameSpace v6 IF> <IF> - インタフェース名
+		●設定可能な文字数
+			1-15文字
+		●設定可能なIF名
+			システムに存在しないIF名のみ設定可能。
+
+使用例
+	○NameSpaceを作成する。
+	＞ ns -s space1 1 veth1 veth2
+	NameSpace"space1",仮想eth"veth1,veth2"が作成され、veth2がNameSpaceに移
+	動される。
+
+	○NameSpaceを削除する。
+	＞ ns -d space1
+
+	○インタフェースをNameSpaceに移動する。
+	＞ ns -m eth1 space1
+	インタフェース"eth1"がNameSpace"space1"に移動される。
+
+	○インタフェースのindex番号一覧を表示する。
+	＞ ns -i
+
+	<出力例>
+	index    name
+	-------- ----------------
+	1        lo
+	2        eth0
+	3        eth1
+	4        eth2
+
+
+●設定確認コマンド
+
+名前
+	show - M46Eの設定確認
+
+書式
+	show all
+	show m46e
+	show pr
+	show pmtu
+	show ns
+	show system
+
+説明
+	M46Eに関連する設定を確認する。
+
+オプション
+	all
+		M46E、関連するsystemの設定を全て表示する
+	m46e
+		PR、PMTU、NSの設定を表示する
+	pr
+		PRの設定を表示する
+	pmtu
+		PMTUの設定を表示する
+	ns
+		NameSpace、PlaneID、NameSpaceにアクセスするためのアドレス、イ
+		ンタフェースの一覧を表示する。
+	system
+		関連するsystemの設定を表示する
+
+
+●設定保存読込コマンド
+
+名前
+	config - M46Eの設定保存読込
+
+書式
+	config save <filepath>
+	config load <filepath>
+
+説明
+	M46Eの設定をファイルに出力する。
+	M46Eの設定をファイルから読み込み、一括で設定する。
+
+オプション
+	save
+		現在のM46Eの設定を指定したファイルに保存する
+	load
+		ファイルに記載された設定をM46Eに適用する。
+

@@ -1,0 +1,19 @@
+insmod /root/m46e/m46e.ko
+
+ifconfig ethx up
+ifconfig ethx up
+ifconfig ethx 0
+ifconfig ethx add xxxx:xxxx::xxxx:xxxxx/64
+ifconfig ethx xxx.xxx.xxx.xxx/24
+ifconfig ethx xxx.xxx.xxx.xxx/24
+ifconfig m46e0 up
+ifconfig m46e0 add xxxx:xxxx::xxxx:xxxx:xxxx/120
+ifconfig m46e0 add xxxx:xxxx::xxxx:xxxx:xxxx/120
+
+route add default dev m46ex
+route -A inet6 add default gw xxxx:xxxx::xxxx:xxxx ethx
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+echo 1 > /proc/sys/net/ipv6/conf/all/forwarding
+
+#/root/m46e/m46ecli -f /root/m46e/config
