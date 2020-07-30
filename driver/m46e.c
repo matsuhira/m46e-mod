@@ -45,7 +45,7 @@
 #include "m46e.h"
 
 MODULE_DESCRIPTION("Stateless Automatic IPv4 over IPv6 tunneling device");
-MODULE_LICENSE("Proprietary");
+MODULE_LICENSE("GPL v2");
 
 static void m46_dev_setup(struct net_device *);
 
