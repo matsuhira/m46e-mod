@@ -557,7 +557,8 @@ static int m46_fragment(struct sk_buff *skb, struct net_device *dev, u32 m46_mtu
 	dgram_mtu = m46_mtu - ipv4h_len;
 	
 	/* reserve space for head room */
-	pad = nf_bridge_pad(skb);	
+	//pad = nf_bridge_pad(skb);	
+	pad = 0;
 #if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,35))
 	rsv_sp = LL_RESERVED_SPACE_EXTRA(rt->dst.dev, pad);
 #else
@@ -1436,7 +1437,8 @@ static const struct net_device_ops m46_netdev_ops = {
 /*	.ndo_uninit = m46_dev_uninit, */
 	.ndo_start_xmit = m46_rcv,
 	.ndo_do_ioctl = m46_ioctl,
-	.ndo_change_mtu = m46_change_mtu,
+	//.ndo_change_mtu = m46_change_mtu,
+	.ndo_change_mtu_rh74 = m46_change_mtu,
 };
 
 /**
